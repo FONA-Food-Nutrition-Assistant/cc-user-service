@@ -34,15 +34,6 @@ export class GetModel {
 
 	async createFonaMembersWithLearningPath() {
 		try {
-			// this.MemberRepository.createQueryBuilder('mem')
-			// 	.insert()
-			// 	.into()
-			// 	.values([
-			// 		{ id: 1, name: 'Fikri Dean Radityo', email: 'deanradityo@gmail.com', learning_path: 1},
-			// 		{ id: 2, name: 'Adrian Finantyo', email: 'Adrian Finantyo@gmail.com', learning_path: 1},
-    		// 	])
-			// 	.execute();
-
 			const user = { 
 				name: 'Fikri Dean Radityo', 
 				email: 'deanradityo@gmail.com', 
@@ -52,7 +43,6 @@ export class GetModel {
 			const result = this.MemberRepository.insert(user);
 			return result;
 
-			
 		} catch (error) {
 			throw error;
 		}

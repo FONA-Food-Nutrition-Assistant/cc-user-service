@@ -6,11 +6,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import config from './config/global.config';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
+import { UserModule } from './module/user/user.module';
 
 @Module({
 	imports: [
 		/** App Modules */
 		ExampleModule,
+		UserModule,
 
 		/** Configuration Modules  */
 		ConfigModule.forRoot({
