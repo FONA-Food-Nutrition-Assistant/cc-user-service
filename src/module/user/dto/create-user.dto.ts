@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsEmail, IsNumber, IsArray, IsEnum } from 'class-validator';
 
-import { gender } from './gender.enum';
+import { gender } from '../../../common/enum/gender.enum';
 
 export class CreateUserDto {
   @IsNotEmpty()

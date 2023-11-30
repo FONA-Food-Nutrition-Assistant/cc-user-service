@@ -5,13 +5,10 @@ import {
 	Get,
 	Post,
 	Put,
-	HttpException,
 	HttpStatus,
-	Res,
 	Headers,
-	Param
 } from '@nestjs/common';
-import { FastifyReply } from 'fastify';
+// import { FastifyReply } from 'fastify';
 
 /* Other Dependencies */
 import { ResponseMessage } from 'src/common/message/message.enum';
@@ -27,23 +24,17 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	// dev: all users (harus bikin authorization atau dijalanin pas lokal)
-	@Get('all')
-	async getUsers() {
-		const data = await this.userService.getUsers();
-
-		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK, data);
-	}
+	// @Get('all')
+	// async getUsers() {
+	// 	const data = await this.userService.getUsers();
+	// 	return new TidyResponse(HttpStatus.OK, ResponseMessage.OK, data);
+	// }
 
 	// user (untuk retrieve data user tertentu dengan syarat headernya harus sesuai sama user biar user 1 gabisa ngambil user 2)
 	@Get()
 	async getUserById(@Headers('fona-client-uid') uid: string) {
 		const data = await this.userService.getUserById(uid);
-
-		if (!data) {
-			throw new HttpException(data, HttpStatus.BAD_REQUEST);
-		}
-
-		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK, data);
+		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_LIST, data);
 	}
 
 	// user

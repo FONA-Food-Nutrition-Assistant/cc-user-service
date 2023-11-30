@@ -23,4 +23,10 @@ export class UserEntity {
 
 	@Column({ type: 'date', nullable: false })
 	date_of_birth: Date;
+
+	@Column({ type: 'date'})
+	created_at: Date;
+
+	@Column({ type: 'date'})
+	updated_at: Date;
 }

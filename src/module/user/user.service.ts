@@ -10,14 +10,29 @@ export class UserService {
 	}
 
 	async getUserById(uid) {
-		return await this.getModel.getUserById(uid);
+		try {
+			const user = await this.getModel.getUserById(uid);
+			return user;
+		} catch(error) {
+			throw error;
+		}
 	}
 
 	async storeUser(params, uid) {
-		return await this.getModel.storeUser({params, uid});
+		try {
+			const user = await this.getModel.storeUser({params, uid});
+			return user;
+		} catch(error) {
+			throw error;
+		}
 	}
 
 	async updateUser(params, uid) {
-		return await this.getModel.updateUser({params, uid});
+		try {
+			const user = await this.getModel.updateUser({params, uid});
+			return user;
+		} catch(error) {
+			throw error;
+		}
 	}
 }
