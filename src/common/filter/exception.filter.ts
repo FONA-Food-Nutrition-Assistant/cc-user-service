@@ -14,7 +14,7 @@ import { ServerResponse } from 'http';
 export class AllExceptionsFilter extends BaseExceptionFilter {
 	catch(exception: any, host: ArgumentsHost): void {
 		const ctx = host.switchToHttp();
-		const response: ServerResponse = ctx.getResponse();
+		const response = ctx.getResponse();
 		const request = ctx.getRequest();
 
 		const isHttpException = exception instanceof HttpException;
@@ -25,7 +25,9 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
 		let message =
 			ErrorMessage[status] || ResponseMessage.ERR_INTERNAL_SERVER_ERROR;
 
-		const errorData = exception.getResponse() as any;
+		const errorData = isHttpException
+			? (exception.getResponse() as any)
+			: exception.response;
 
 		const responseData = {
 			status,
@@ -34,8 +36,13 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
 			data: errorData,
 		};
 
-		response.writeHead(status, { 'Content-Type': 'application/json' });
-		response.write(JSON.stringify(responseData));
-		response.end();
+		if (response instanceof ServerResponse) {
+			response.writeHead(status, { 'Content-Type': 'application/json' });
+			response.write(JSON.stringify(responseData));
+			response.end();
+			return;
+		}
+
+		response.status(status).send(responseData);
 	}
 }

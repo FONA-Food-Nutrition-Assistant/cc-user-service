@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
+import { error } from 'console';
+import { ResponseMessage } from 'src/common/message/message.enum';
+
 
 @Injectable()
 export class GetModel {
@@ -12,7 +15,7 @@ export class GetModel {
 
 	async getUsers() {
 		try {
-			const result = this.UserRepository.query(`SELECT * FROM USERS`); // ganti ke querybuilder
+			const result = await this.UserRepository.find(); // ganti ke querybuilder
 			return result;
 
 		} catch (error) {
@@ -20,38 +23,74 @@ export class GetModel {
 		}
 	}
 
-	// async getFonaMembersWithLearningPath() {
-	// 	try {
-	// 		const query = this.MemberRepository.createQueryBuilder('mem')
-	// 			.select('mem.id', 'id')
-	// 			.addSelect('mem.name', 'name')
-	// 			.addSelect('mem.email', 'email')
-	// 			.addSelect('lp.name', 'learningPath')
-	// 			.leftJoin(LearningPathEntity, 'lp', 'lp.id = mem.learning_path')
-	// 			.orderBy('mem.id, mem.name', 'ASC');
+	async getUserById({uid}) {
+		try {
+			const result = this.UserRepository.findOne({
+				where: {
+					uid
+				}
+			})
 
-	// 		return {
-	// 			data: await query.getRawMany(),
-	// 			total_data: await query.getCount(),
-	// 		};
-	// 	} catch (error) {
-	// 		throw error;
-	// 	}
-	// }
+			return result;
 
-	// async createFonaMembersWithLearningPath() {
-	// 	try {
-	// 		const user = { 
-	// 			name: 'Fikri Dean Radityo', 
-	// 			email: 'deanradityo@gmail.com', 
-	// 			learning_path: 1
-	// 		};
+		} catch (error) {
+			throw error;
+		}
+	}
 
-	// 		const result = this.MemberRepository.insert(user);
-	// 		return result;
+	async storeUser({params, uid}) {
+		try {
+			const user = {
+				uid: uid,
+				email: params.email,
+				height: params.height,
+				weight: params.weight,
+				activity: params.activity,
+				gender: params.gender,
+				date_of_birth: params.date_of_birth,
+			}
 
-	// 	} catch (error) {
-	// 		throw error;
-	// 	}
-	// }
+			const checker = await this.UserRepository.findOne({
+				where: {
+					uid
+				}
+			})
+
+			if (checker) {
+				return checker;
+			}
+
+			const result = await this.UserRepository.insert(user);
+			return result;
+			
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async updateUser({params, uid}) {
+		try {
+			const user = await this.UserRepository.findOne({
+				where: {
+					uid
+				}
+			})
+			
+			const updatedData = {
+				uid,
+				email: params.email || user.email,
+				height: params.height || user.height,
+				weight: params.weight || user.weight,
+				activity: params.activity || user.activity,
+				gender: params.gender || user.gender,
+				date_of_birth: params.date_of_birth || user.date_of_birth,
+			}
+
+			const result = await this.UserRepository.update(user, updatedData);
+			return result;
+
+		} catch (error) {
+			throw error;
+		}
+	}
 }

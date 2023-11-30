@@ -2,10 +2,9 @@ import { Column, Entity, Index, PrimaryColumn, PrimaryGeneratedColumn } from 'ty
 
 @Entity('users')
 export class UserEntity {
-	@PrimaryGeneratedColumn()
 	@PrimaryColumn()
 	@Index()
-	UID: number;
+	uid: string;
 
 	@Column({ type: 'varchar', length: 255, nullable: false })
 	email: string;
@@ -24,7 +23,4 @@ export class UserEntity {
 
 	@Column({ type: 'date', nullable: false })
 	date_of_birth: Date;
-
-	@Column({ type: 'date', nullable: false })
-	timestamp: Date;
 }

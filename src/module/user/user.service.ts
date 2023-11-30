@@ -9,7 +9,15 @@ export class UserService {
 		return await this.getModel.getUsers();
 	}
 
-	// async createFonaMembersWithLearningPath() {
-	// 	return await this.getModel.createFonaMembersWithLearningPath();
-	// }
+	async getUserById(uid) {
+		return await this.getModel.getUserById(uid);
+	}
+
+	async storeUser(params, uid) {
+		return await this.getModel.storeUser({params, uid});
+	}
+
+	async updateUser(params, uid) {
+		return await this.getModel.updateUser({params, uid});
+	}
 }
