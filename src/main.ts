@@ -4,7 +4,7 @@ import {
 	FastifyAdapter,
 	NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/filter/exception.filter';
 import { ConfigService } from '@nestjs/config';
 
@@ -31,6 +31,12 @@ async function bootstrap() {
 		});
 
 		app.setGlobalPrefix(configService.get('app.prefix'));
+
+		app.useGlobalPipes(
+			new ValidationPipe({
+			  transform: true,
+			}),
+		  );
 
 		app.useGlobalFilters(new AllExceptionsFilter());
 

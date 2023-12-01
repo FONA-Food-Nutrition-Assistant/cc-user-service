@@ -10,6 +10,8 @@ export enum ResponseMessage {
 	ERR_CREATE = 'Failed to create data',
 	ERR_UPDATE = 'Failed to update data',
 	ERR_DELETE = 'Failed to delete data',
+	ERR_USER_NOT_FOUND = 'Failed to get user data. User not found!',
+	ERR_USER_HAS_BEEN_REGISTERED = 'Failed to store user data. User has been registered!',
 
 	// Server Error
 	ERR_INTERNAL_SERVER_ERROR = 'Internal server error',
