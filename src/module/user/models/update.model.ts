@@ -1,14 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ResponseMessage } from 'src/common/message/message.enum';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
-import { error } from 'console';
-import { ResponseMessage } from 'src/common/message/message.enum';
-import { HttpException, HttpStatus } from '@nestjs/common';
 import { UserAllergyEntity } from '../entities/user-allergy.entity';
 
 @Injectable()
-export class GetModel {
+export class UpdateModel {
 	constructor(
 		@InjectRepository(UserEntity)
 		private readonly UserRepository: Repository<UserEntity>,
@@ -16,42 +14,49 @@ export class GetModel {
 		private readonly UserAllergyRepository: Repository<UserAllergyEntity>,
 	) {}
 
-	async getUsers() {
+	async updateUser({ params, uid }) {
 		try {
-			const result = await this.UserRepository.find(); // ganti ke querybuilder
-			return result;
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	async getUserById(uid) {
-		try {
-			const result = await this.UserRepository.createQueryBuilder('user')
-				.select('*')
+			const user = await this.UserRepository.createQueryBuilder('user')
 				.where('uid = :uid', { uid: uid })
 				.getRawOne();
 
-			if (!result)
+			if (!user)
 				throw new HttpException(
 					ResponseMessage.ERR_USER_NOT_FOUND,
 					HttpStatus.BAD_REQUEST,
 				);
 
+			const { allergies, email, ...rest } = params;
+
+			const updatedData = {
+				...rest,
+				updated_at: new Date().toISOString().split('T')[0],
+			};
+
+			const result = await this.UserRepository.createQueryBuilder()
+				.update()
+				.set(updatedData)
+				.where('uid = :uid', { uid: uid })
+				.execute()
+				.catch(error => {
+					throw error; // Rethrow the error to handle it where the functio`n is called
+				});
+
 			return result;
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	async getUserAllergyByUserId(uid: string) {
+	async deleteExistingAllergy(uid: string) {
 		try {
 			const query = this.UserAllergyRepository.createQueryBuilder('ua')
-				.select('*')
+				.delete()
+				.from('user_allergy')
 				.where('user_id = :user_id', { user_id: uid });
 
-			return await query.getRawMany();
-		} catch {
+			return await query.execute();
+		} catch (error) {
 			throw error;
 		}
 	}
