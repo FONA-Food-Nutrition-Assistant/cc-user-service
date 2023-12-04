@@ -33,12 +33,12 @@ export class StoreModel {
 				...params,
 			};
 
-			const result = await this.UserRepository.createQueryBuilder()
+			await this.UserRepository.createQueryBuilder()
 				.insert()
 				.values([newUser])
 				.execute();
 
-			return result;
+			return newUser;
 		} catch (error) {
 			throw error;
 		}
