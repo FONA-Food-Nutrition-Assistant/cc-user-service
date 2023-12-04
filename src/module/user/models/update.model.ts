@@ -30,10 +30,9 @@ export class UpdateModel {
 
 			const updatedData = {
 				...rest,
-				updated_at: new Date().toISOString().split('T')[0],
 			};
 
-			const result = await this.UserRepository.createQueryBuilder()
+			await this.UserRepository.createQueryBuilder()
 				.update()
 				.set(updatedData)
 				.where('uid = :uid', { uid: uid })
@@ -41,8 +40,6 @@ export class UpdateModel {
 				.catch(error => {
 					throw error; // Rethrow the error to handle it where the functio`n is called
 				});
-
-			return result;
 		} catch (error) {
 			throw error;
 		}

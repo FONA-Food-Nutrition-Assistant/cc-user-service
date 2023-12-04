@@ -1,4 +1,10 @@
-import { Column, Entity, Index, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	Index,
+	PrimaryColumn,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -15,18 +21,18 @@ export class UserEntity {
 	@Column({ type: 'int', nullable: false })
 	weight: number;
 
-	@Column({ type: 'int', nullable: false })
-	activity: number;
+	@Column({ type: 'varchar', length: 255, nullable: false })
+	activity: string;
 
-	@Column({ type: 'int', nullable: false })
-	gender: number; // ganti ke enum (laki-laki & perempuan)
+	@Column({ type: 'varchar', length: 255, nullable: false })
+	gender: string;
 
 	@Column({ type: 'date', nullable: false })
 	date_of_birth: Date;
 
-	@Column({ type: 'date'})
+	@Column({ type: 'date' })
 	created_at: Date;
 
-	@Column({ type: 'date'})
+	@Column({ type: 'date' })
 	updated_at: Date;
 }
