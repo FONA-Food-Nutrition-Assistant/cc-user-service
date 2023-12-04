@@ -47,11 +47,14 @@ export class UserService {
 
 	async storeUser(params: CreateUserDto, uid: string) {
 		try {
-			await this.storeModel.storeUser({ params, uid });
+			const data = await this.storeModel.storeUser({ params, uid });
+
 			await this.storeModel.storeUserAllergy({
 				params,
 				uid,
 			});
+
+			return data;
 		} catch (error) {
 			throw error;
 		}

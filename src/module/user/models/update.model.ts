@@ -32,7 +32,7 @@ export class UpdateModel {
 				...rest,
 			};
 
-			await this.UserRepository.createQueryBuilder()
+			const result = await this.UserRepository.createQueryBuilder()
 				.update()
 				.set(updatedData)
 				.where('uid = :uid', { uid: uid })
@@ -40,6 +40,8 @@ export class UpdateModel {
 				.catch(error => {
 					throw error; // Rethrow the error to handle it where the functio`n is called
 				});
+
+			return updatedData;
 		} catch (error) {
 			throw error;
 		}
