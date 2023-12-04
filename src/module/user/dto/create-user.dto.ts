@@ -28,7 +28,7 @@ export class CreateUserDto {
 
 	@IsNotEmpty()
 	@IsEnum(Activity)
-	activity: number;
+	activity: string;
 
 	@IsNotEmpty()
 	@IsEnum(Gender)
