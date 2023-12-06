@@ -9,8 +9,8 @@ if (!envFound || envFound.error) {
 export default () => ({
 	nodeEnv: process.env.NODE_ENV || 'development',
 	app: {
-		host: process.env.HOST || '127.0.0.1',
-		port: process.env.PORT || 8080,
-		prefix: process.env.PREFIX || 'api',
+		host: process.env.APP_HOST || '127.0.0.1',
+		port: process.env.APP_PORT || 8080,
+		prefix: process.env.APP_PREFIX || 'api',
 	},
 });
