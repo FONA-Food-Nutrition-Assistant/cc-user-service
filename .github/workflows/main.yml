@@ -1,0 +1,35 @@
+name: User Service to Cloud Run
+
+on:
+  push:
+    branches:
+      - 'staging'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v2
+
+      - name: install the gcloud cli
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.GOOGLE_PROJECT }}
+          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          install_components: 'gke-gcloud-auth-plugin'
+          export_default_credentials: true
+
+      - name: build and push the docker image
+        env:
+          GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        run: |
+          gcloud auth configure-docker asia-southeast2-docker.pkg.dev
+          docker build -t asia-southeast1-docker.pkg.dev/bangkit-fona-development/fona-microservices/gateway-service .
+          docker push asia-southeast1-docker.pkg.dev/bangkit-fona-development/fona-microservices/gateway-service
+
+      - name: deploy to cloud run
+        env:
+          GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        run: |
+          gcloud run deploy gateway-service --image=asia-southeast1-docker.pkg.dev/bangkit-fona-development/fona-microservices/gateway-service --allow-unauthenticated  --port=8080  --service-account=542299058230-compute@developer.gserviceaccount.com --vpc-connector=projects/bangkit-fona-development/locations/asia-southeast1/connectors/fona-dev-vpc --vpc-egress=all-traffic --cpu-boost --ingress=internal --region=asia-southeast1 --project=bangkit-fona-development
