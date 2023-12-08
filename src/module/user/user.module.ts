@@ -18,9 +18,12 @@ import { UpdateModel } from './models/update.model';
 /* Entity */
 import { UserEntity } from './entities/user.entity';
 import { UserAllergyEntity } from './entities/user-allergy.entity';
+import { AllergyEntity } from './entities/allergy.entity';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([UserEntity, UserAllergyEntity])],
+	imports: [
+		TypeOrmModule.forFeature([UserEntity, UserAllergyEntity, AllergyEntity]),
+	],
 	controllers: [UserController],
 	providers: [
 		/** Services */

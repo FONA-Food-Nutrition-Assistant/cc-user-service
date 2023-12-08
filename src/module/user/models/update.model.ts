@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ResponseMessage } from 'src/common/message/message.enum';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { UserAllergyEntity } from '../entities/user-allergy.entity';
 
@@ -14,7 +14,7 @@ export class UpdateModel {
 		private readonly UserAllergyRepository: Repository<UserAllergyEntity>,
 	) {}
 
-	async updateUser({ params, uid }) {
+	async updateUser({ params, uid }): Promise<UpdateResult> {
 		try {
 			const user = await this.UserRepository.createQueryBuilder('user')
 				.where('uid = :uid', { uid: uid })
@@ -28,20 +28,11 @@ export class UpdateModel {
 
 			const { allergies, email, ...rest } = params;
 
-			const updatedData = {
-				...rest,
-			};
-
-			const result = await this.UserRepository.createQueryBuilder()
+			return await this.UserRepository.createQueryBuilder()
 				.update()
-				.set(updatedData)
+				.set(rest)
 				.where('uid = :uid', { uid: uid })
-				.execute()
-				.catch(error => {
-					throw error; // Rethrow the error to handle it where the functio`n is called
-				});
-
-			return updatedData;
+				.execute();
 		} catch (error) {
 			throw error;
 		}

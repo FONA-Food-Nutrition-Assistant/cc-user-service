@@ -32,12 +32,14 @@ export class UserService {
 				user.gender,
 				user.activity,
 			);
+			const allergies = await this.getModel.getUserAllergyByUserId(uid);
 
 			const data = {
 				...user,
 				age,
 				bmi: Math.round(bmi * 100) / 100,
 				tdee: Math.round(tdee * 100) / 100,
+				allergies,
 			};
 			return data;
 		} catch (error) {
@@ -63,15 +65,20 @@ export class UserService {
 	async updateUser(params: UpdateUserDto, uid: string) {
 		try {
 			await this.updateModel.deleteExistingAllergy(uid);
-			const user = await this.updateModel.updateUser({ params, uid });
-			let allergies = {};
+
+			await this.updateModel.updateUser({ params, uid });
+
 			if (params.allergies.length > 0) {
 				await this.storeModel.storeUserAllergy({ params, uid });
 			}
-			return {
-				user,
-				allergies,
-			};
+
+			const allergies = await this.getModel.getAllergyByIds(params.allergies);
+
+			const user = await this.getModel.getUserById(uid);
+
+			const data = { ...user, allergies };
+
+			return data;
 		} catch (error) {
 			throw error;
 		}
