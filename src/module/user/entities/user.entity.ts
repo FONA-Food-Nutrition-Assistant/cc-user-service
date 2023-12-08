@@ -12,9 +12,6 @@ export class UserEntity {
 	@Index()
 	uid: string;
 
-	@Column({ type: 'varchar', length: 255, nullable: false })
-	email: string;
-
 	@Column({ type: 'int', nullable: false })
 	height: number;
 

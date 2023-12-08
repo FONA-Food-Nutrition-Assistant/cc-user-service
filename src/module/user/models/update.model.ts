@@ -26,7 +26,7 @@ export class UpdateModel {
 					HttpStatus.BAD_REQUEST,
 				);
 
-			const { allergies, email, ...rest } = params;
+			const { allergies, ...rest } = params;
 
 			return await this.UserRepository.createQueryBuilder()
 				.update()
