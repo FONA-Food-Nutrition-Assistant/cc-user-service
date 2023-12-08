@@ -34,9 +34,9 @@ async function bootstrap() {
 
 		app.useGlobalPipes(
 			new ValidationPipe({
-			  transform: true,
+				transform: true,
 			}),
-		  );
+		);
 
 		app.useGlobalFilters(new AllExceptionsFilter());
 
@@ -48,9 +48,10 @@ async function bootstrap() {
 			`Server running on http://${configService.get(
 				'app.host',
 			)}:${configService.get('app.port')}`,
+			'Bootstrap',
 		);
 	} catch (error) {
-		Logger.error(`Error starting server: ${error}`);
+		Logger.error(`Error starting server: ${error}`, 'Bootstrap');
 		process.exit(1);
 	}
 }
