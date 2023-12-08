@@ -7,9 +7,6 @@ import { Gender } from '../../../common/enum/gender.enum';
 import { Activity } from 'src/common/enum/activity.enum';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-	@IsEmail()
-	email: string;
-
 	@IsNumber()
 	height: number;
 

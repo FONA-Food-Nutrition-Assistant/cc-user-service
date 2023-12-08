@@ -6,6 +6,7 @@ import { error } from 'console';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { UserAllergyEntity } from '../entities/user-allergy.entity';
+import { AllergyEntity } from '../entities/allergy.entity';
 
 @Injectable()
 export class GetModel {
@@ -14,6 +15,8 @@ export class GetModel {
 		private readonly UserRepository: Repository<UserEntity>,
 		@InjectRepository(UserAllergyEntity)
 		private readonly UserAllergyRepository: Repository<UserAllergyEntity>,
+		@InjectRepository(AllergyEntity)
+		private readonly AllergyRepository: Repository<AllergyEntity>,
 	) {}
 
 	async getUsers() {
@@ -44,15 +47,21 @@ export class GetModel {
 		}
 	}
 
-	async getUserAllergyByUserId(uid: string) {
-		try {
-			const query = this.UserAllergyRepository.createQueryBuilder('ua')
-				.select('*')
-				.where('user_id = :user_id', { user_id: uid });
+	async getUserAllergyByUserId(uid: string): Promise<AllergyEntity[]> {
+		const query = this.UserAllergyRepository.createQueryBuilder('ua')
+			.select('a.id', 'id')
+			.addSelect('a.name', 'name')
+			.leftJoin(AllergyEntity, 'a', 'a.id = ua.allergy_id')
+			.where('user_id = :user_id', { user_id: uid });
 
-			return await query.getRawMany();
-		} catch {
-			throw error;
-		}
+		return await query.getRawMany();
+	}
+
+	async getAllergyByIds(allergy_ids: Array<number>): Promise<AllergyEntity[]> {
+		const query = this.AllergyRepository.createQueryBuilder('a')
+			.select('id')
+			.addSelect('name')
+			.where('id IN (:...allergy_ids)', { allergy_ids });
+		return await query.getRawMany();
 	}
 }
