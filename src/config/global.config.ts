@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 const envFound = dotenv.config();
 
 if (!envFound || envFound.error) {
-	Logger.error("Couldn't find .env file");
+	Logger.warn("Couldn't find .env file", 'Bootstrap');
 }
 
 export default () => ({

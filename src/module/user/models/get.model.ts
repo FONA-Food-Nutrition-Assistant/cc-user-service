@@ -58,10 +58,14 @@ export class GetModel {
 	}
 
 	async getAllergyByIds(allergy_ids: Array<number>): Promise<AllergyEntity[]> {
-		const query = this.AllergyRepository.createQueryBuilder('a')
+		let query = this.AllergyRepository.createQueryBuilder('a')
 			.select('id')
-			.addSelect('name')
-			.where('id IN (:...allergy_ids)', { allergy_ids });
+			.addSelect('name');
+		if (allergy_ids.length > 0) {
+			query = query.where('id IN (:...allergy_ids)', { allergy_ids });
+		} else {
+			query = query.where('1 = 0');
+		}
 		return await query.getRawMany();
 	}
 }

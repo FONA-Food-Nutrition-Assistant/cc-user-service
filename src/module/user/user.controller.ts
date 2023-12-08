@@ -42,8 +42,8 @@ export class UserController {
 		@Body() params: CreateUserDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		await this.userService.storeUser(params, uid);
-		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, {});
+		const data = await this.userService.storeUser(params, uid);
+		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
 	}
 
 	@Put()

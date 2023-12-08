@@ -1,16 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { GetModel } from './models/get.model';
 import { StoreModel } from './models/store.model';
 import { UpdateModel } from './models/update.model';
 import { CalculationHelper } from 'src/util/calculationHelper';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { runInTransaction } from 'src/common/db/run-in-transaction';
+import { DataSource } from 'typeorm';
+import { ResponseMessage } from 'src/common/message/message.enum';
 
 @Injectable()
 export class UserService {
 	private readonly calculationHelper = new CalculationHelper();
 
 	constructor(
+		private readonly dataSource: DataSource,
 		private readonly getModel: GetModel,
 		private readonly storeModel: StoreModel,
 		private readonly updateModel: UpdateModel,
@@ -49,14 +53,22 @@ export class UserService {
 
 	async storeUser(params: CreateUserDto, uid: string) {
 		try {
-			const data = await this.storeModel.storeUser({ params, uid });
+			return await runInTransaction(this.dataSource, async em => {
+				const allergies = await this.getModel.getAllergyByIds(params.allergies);
+				const isAllergyExist = allergies.length === params.allergies.length;
 
-			await this.storeModel.storeUserAllergy({
-				params,
-				uid,
+				if (!isAllergyExist) {
+					throw new HttpException(
+						"Allergy doesn't exist",
+						HttpStatus.BAD_REQUEST,
+					);
+				}
+
+				const data = await this.storeModel.storeUser(params, uid, em);
+				await this.storeModel.storeUserAllergy(params, uid, em);
+
+				return data;
 			});
-
-			return data;
 		} catch (error) {
 			throw error;
 		}
@@ -64,21 +76,30 @@ export class UserService {
 
 	async updateUser(params: UpdateUserDto, uid: string) {
 		try {
-			await this.updateModel.deleteExistingAllergy(uid);
+			return await runInTransaction(this.dataSource, async em => {
+				await this.updateModel.updateUser(params, uid, em);
 
-			await this.updateModel.updateUser({ params, uid });
+				const allergies = await this.getModel.getAllergyByIds(params.allergies);
+				const isAllergyExist = allergies.length === params.allergies.length;
 
-			if (params.allergies.length > 0) {
-				await this.storeModel.storeUserAllergy({ params, uid });
-			}
+				if (!isAllergyExist) {
+					throw new HttpException(
+						"Allergy doesn't exist",
+						HttpStatus.BAD_REQUEST,
+					);
+				}
 
-			const allergies = await this.getModel.getAllergyByIds(params.allergies);
+				if (params.allergies.length > 0) {
+					await this.updateModel.deleteExistingUserAllergy(uid, em);
+					await this.storeModel.storeUserAllergy(params, uid, em);
+				}
 
-			const user = await this.getModel.getUserById(uid);
+				const user = await this.getModel.getUserById(uid);
 
-			const data = { ...user, allergies };
+				const data = { ...user, allergies };
 
-			return data;
+				return data;
+			});
 		} catch (error) {
 			throw error;
 		}
