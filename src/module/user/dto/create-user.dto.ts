@@ -1,23 +1,15 @@
 import {
 	IsNotEmpty,
 	IsString,
-	IsEmail,
 	IsNumber,
 	IsEnum,
-	IsOptional,
 	IsArray,
-	isNumber,
-	ArrayNotEmpty,
 } from 'class-validator';
 
 import { Gender } from '../../../common/enum/gender.enum';
 import { Activity } from 'src/common/enum/activity.enum';
 
 export class CreateUserDto {
-	@IsNotEmpty()
-	@IsEmail()
-	email: string;
-
 	@IsNotEmpty()
 	@IsNumber()
 	height: number;

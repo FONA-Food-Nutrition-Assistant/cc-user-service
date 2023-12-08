@@ -18,7 +18,6 @@ export class StoreModel {
 		try {
 			const checker = await this.UserRepository.createQueryBuilder('user')
 				.where('uid = :uid', { uid: uid })
-				.orWhere('email = :email', { email: params.email })
 				.getRawOne();
 
 			if (checker) {
