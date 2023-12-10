@@ -29,6 +29,7 @@ export class UserService {
 			const user = await this.getModel.getUserById(uid);
 			const age = this.calculationHelper.calculateAge(user.date_of_birth);
 			const bmi = this.calculationHelper.calculateBMI(user.weight, user.height);
+			const bmiStatus = this.calculationHelper.getBMIStatus(bmi);
 			const tdee = this.calculationHelper.calculateTDEE(
 				user.weight,
 				user.height,
@@ -42,6 +43,7 @@ export class UserService {
 				...user,
 				age,
 				bmi: Math.round(bmi * 100) / 100,
+				bmi_status: bmiStatus,
 				tdee: Math.round(tdee * 100) / 100,
 				allergies,
 			};

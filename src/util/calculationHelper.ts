@@ -1,6 +1,7 @@
 import { Activity } from 'src/common/enum/activity.enum';
 import { ActivityValue } from 'src/common/const/activity.const';
 import { Gender } from 'src/common/enum/gender.enum';
+import { BMIStatus } from 'src/common/enum/bmi-status.enum';
 
 export class CalculationHelper {
 	calculateAge(dateOfBirth: Date) {
@@ -27,5 +28,17 @@ export class CalculationHelper {
 		}
 		const tdee = bmr * activityValue;
 		return tdee;
+	}
+
+	getBMIStatus(bmi: number) {
+		if (bmi < 18.5) {
+			return BMIStatus.UNDERWEIGHT;
+		} else if (bmi < 25) {
+			return BMIStatus.NORMAL;
+		} else if (bmi < 30) {
+			return BMIStatus.OVERWEIGHT;
+		} else {
+			return BMIStatus.OBESE;
+		}
 	}
 }
