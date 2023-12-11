@@ -32,12 +32,12 @@ export class UpdateModel {
 				);
 
 			const { allergies, ...rest } = params;
+			const newUser = {
+				...user,
+				...rest,
+			};
 
-			return await this.UserRepository.createQueryBuilder()
-				.update()
-				.set(rest)
-				.where('uid = :uid', { uid: uid })
-				.execute();
+			return await em.save(UserEntity, newUser);
 		} catch (error) {
 			throw error;
 		}
