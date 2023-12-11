@@ -1,9 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ResponseMessage } from 'src/common/message/message.enum';
-import { DataSource, EntityManager, Repository, UpdateResult } from 'typeorm';
+import {
+	DataSource,
+	DeleteResult,
+	EntityManager,
+	Repository,
+	UpdateResult,
+} from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { UserAllergyEntity } from '../entities/user-allergy.entity';
+import { RequestUpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UpdateModel {
@@ -16,41 +23,17 @@ export class UpdateModel {
 	) {}
 
 	async updateUser(
-		params,
+		userData: UserEntity,
 		uid: string,
 		em: EntityManager = this.dataSource.manager,
 	): Promise<UpdateResult> {
-		try {
-			const user = await this.UserRepository.createQueryBuilder('user')
-				.where('uid = :uid', { uid: uid })
-				.getRawOne();
-
-			if (!user)
-				throw new HttpException(
-					ResponseMessage.ERR_USER_NOT_FOUND,
-					HttpStatus.BAD_REQUEST,
-				);
-
-			const { allergies, ...rest } = params;
-			const newUser = {
-				...user,
-				...rest,
-			};
-
-			return await em.save(UserEntity, newUser);
-		} catch (error) {
-			throw error;
-		}
+		return await em.update(UserEntity, uid, userData);
 	}
 
 	async deleteExistingUserAllergy(
 		uid: string,
 		em: EntityManager = this.dataSource.manager,
-	) {
-		try {
-			return await em.delete(UserAllergyEntity, { user_id: uid });
-		} catch (error) {
-			throw error;
-		}
+	): Promise<DeleteResult> {
+		return await em.delete(UserAllergyEntity, { user_id: uid });
 	}
 }

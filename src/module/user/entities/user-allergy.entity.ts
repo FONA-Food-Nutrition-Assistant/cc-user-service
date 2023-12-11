@@ -4,7 +4,7 @@ import { Column, Entity, Index, PrimaryColumn, Unique } from 'typeorm';
 export class UserAllergyEntity {
 	@PrimaryColumn()
 	@Index()
-	id: number;
+	id?: number;
 
 	@Column({ type: 'varchar', length: 255, nullable: false })
 	@Unique(['user_id', 'allergy_id'])
@@ -15,8 +15,8 @@ export class UserAllergyEntity {
 	allergy_id: number;
 
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-	created_at: Date;
+	created_at?: Date;
 
 	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-	updated_at: Date;
+	updated_at?: Date;
 }
