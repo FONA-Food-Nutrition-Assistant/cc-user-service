@@ -12,7 +12,7 @@ import {
 import { Gender } from '../../../common/enum/gender.enum';
 import { Activity } from 'src/common/enum/activity.enum';
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
+export class RequestUpdateUserDto extends PartialType(CreateUserDto) {
 	@IsOptional()
 	@IsNumber()
 	height: number;
@@ -23,18 +23,18 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
 	@IsOptional()
 	@IsEnum(Activity)
-	activity: string;
+	activity: Activity;
 
 	@IsOptional()
 	@IsEnum(Gender)
-	gender: string;
+	gender: Gender;
 
 	@IsOptional()
 	@IsString()
-	date_of_birth: string;
+	date_of_birth: Date;
 
 	@IsOptional()
 	@IsArray()
 	@IsNumber({}, { each: true })
-	allergies: Array<number> = [];
+	allergies: Array<number>;
 }

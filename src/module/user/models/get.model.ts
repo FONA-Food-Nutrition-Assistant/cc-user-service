@@ -19,32 +19,17 @@ export class GetModel {
 		private readonly AllergyRepository: Repository<AllergyEntity>,
 	) {}
 
-	async getUsers() {
-		try {
-			const result = await this.UserRepository.find(); // ganti ke querybuilder
-			return result;
-		} catch (error) {
-			throw error;
-		}
+	async getUsers(): Promise<UserEntity[]> {
+		const query = this.UserRepository.createQueryBuilder('user');
+		return await query.getRawMany();
 	}
 
-	async getUserById(uid) {
-		try {
-			const result = await this.UserRepository.createQueryBuilder('user')
-				.select('*')
-				.where('uid = :uid', { uid: uid })
-				.getRawOne();
+	async getUserById(uid: string): Promise<UserEntity> {
+		const query = this.UserRepository.createQueryBuilder('user')
+			.select('*')
+			.where('uid = :uid', { uid: uid });
 
-			if (!result)
-				throw new HttpException(
-					ResponseMessage.ERR_USER_NOT_FOUND,
-					HttpStatus.BAD_REQUEST,
-				);
-
-			return result;
-		} catch (error) {
-			throw error;
-		}
+		return await query.getRawOne();
 	}
 
 	async getUserAllergyByUserId(uid: string): Promise<AllergyEntity[]> {

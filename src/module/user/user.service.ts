@@ -4,10 +4,11 @@ import { StoreModel } from './models/store.model';
 import { UpdateModel } from './models/update.model';
 import { CalculationHelper } from 'src/util/calculationHelper';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { RequestUpdateUserDto } from './dto/update-user.dto';
 import { runInTransaction } from 'src/common/db/run-in-transaction';
 import { DataSource } from 'typeorm';
 import { ResponseMessage } from 'src/common/message/message.enum';
+import { UserAllergyEntity } from './entities/user-allergy.entity';
 
 @Injectable()
 export class UserService {
@@ -27,6 +28,14 @@ export class UserService {
 	async getUserById(uid: string) {
 		try {
 			const user = await this.getModel.getUserById(uid);
+
+			if (!user) {
+				throw new HttpException(
+					ResponseMessage.ERR_USER_NOT_FOUND,
+					HttpStatus.BAD_REQUEST,
+				);
+			}
+
 			const age = this.calculationHelper.calculateAge(user.date_of_birth);
 			const bmi = this.calculationHelper.calculateBMI(user.weight, user.height);
 			const bmiStatus = this.calculationHelper.getBMIStatus(bmi);
@@ -56,6 +65,15 @@ export class UserService {
 	async storeUser(params: CreateUserDto, uid: string) {
 		try {
 			return await runInTransaction(this.dataSource, async em => {
+				const user = await this.getModel.getUserById(uid);
+
+				if (user) {
+					throw new HttpException(
+						ResponseMessage.ERR_USER_HAS_BEEN_REGISTERED,
+						HttpStatus.BAD_REQUEST,
+					);
+				}
+
 				const allergies = await this.getModel.getAllergyByIds(params.allergies);
 				const isAllergyExist = allergies.length === params.allergies.length;
 
@@ -66,8 +84,17 @@ export class UserService {
 					);
 				}
 
-				const data = await this.storeModel.storeUser(params, uid, em);
-				await this.storeModel.storeUserAllergy(params, uid, em);
+				const { allergies: _, ...rest } = params;
+				const newUserData = { uid, ...rest };
+
+				const data = await this.storeModel.storeUser(newUserData, em);
+
+				const prepUserAllergy = params.allergies.map(allergyId => ({
+					user_id: uid,
+					allergy_id: allergyId,
+				})) as Array<UserAllergyEntity>;
+
+				await this.storeModel.storeUserAllergy(prepUserAllergy, em);
 
 				return data;
 			});
@@ -76,10 +103,27 @@ export class UserService {
 		}
 	}
 
-	async updateUser(params: UpdateUserDto, uid: string) {
+	async updateUser(params: RequestUpdateUserDto, uid: string) {
 		try {
 			return await runInTransaction(this.dataSource, async em => {
-				await this.updateModel.updateUser(params, uid, em);
+				const user = await this.getModel.getUserById(uid);
+
+				if (!user) {
+					throw new HttpException(
+						ResponseMessage.ERR_USER_NOT_FOUND,
+						HttpStatus.BAD_REQUEST,
+					);
+				}
+
+				const { allergies: _, ...newUserData } = params;
+
+				await this.updateModel.updateUser(newUserData, uid, em);
+
+				if (!params.allergies) {
+					const userAllergies = await this.getModel.getUserAllergyByUserId(uid);
+					const data = { ...user, ...newUserData, allergies: userAllergies };
+					return data;
+				}
 
 				const allergies = await this.getModel.getAllergyByIds(params.allergies);
 				const isAllergyExist = allergies.length === params.allergies.length;
@@ -91,14 +135,15 @@ export class UserService {
 					);
 				}
 
-				if (params.allergies.length > 0) {
-					await this.updateModel.deleteExistingUserAllergy(uid, em);
-					await this.storeModel.storeUserAllergy(params, uid, em);
-				}
+				await this.updateModel.deleteExistingUserAllergy(uid, em);
+				const prepUserAllergy = params.allergies.map(allergyId => ({
+					user_id: uid,
+					allergy_id: allergyId,
+				})) as Array<UserAllergyEntity>;
 
-				const user = await this.getModel.getUserById(uid);
+				await this.storeModel.storeUserAllergy(prepUserAllergy, em);
 
-				const data = { ...user, allergies };
+				const data = { ...user, ...newUserData, allergies };
 
 				return data;
 			});

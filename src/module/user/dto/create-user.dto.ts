@@ -20,14 +20,14 @@ export class CreateUserDto {
 
 	@IsNotEmpty()
 	@IsEnum(Activity)
-	activity: string;
+	activity: Activity;
 
 	@IsNotEmpty()
 	@IsEnum(Gender)
-	gender: string;
+	gender: Gender;
 
 	@IsString()
-	date_of_birth: string;
+	date_of_birth: Date;
 
 	@IsArray()
 	@IsNumber({}, { each: true })
