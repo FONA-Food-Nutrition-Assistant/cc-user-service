@@ -16,7 +16,7 @@ import { UserService } from './user.service';
 
 /* DTO */
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { RequestUpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -42,13 +42,13 @@ export class UserController {
 		@Body() params: CreateUserDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
-		await this.userService.storeUser(params, uid);
-		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, {});
+		const data = await this.userService.storeUser(params, uid);
+		return new TidyResponse(HttpStatus.OK, ResponseMessage.OK_CREATE, data);
 	}
 
 	@Put()
 	async alterUserById(
-		@Body() params: UpdateUserDto,
+		@Body() params: RequestUpdateUserDto,
 		@Headers('fona-client-uid') uid: string,
 	) {
 		const data = await this.userService.updateUser(params, uid);

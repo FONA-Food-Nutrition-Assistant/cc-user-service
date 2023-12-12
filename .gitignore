@@ -45,3 +45,5 @@ lerna-debug.log*
 /.sass-cache
 /coverage
 /npm-debug.log
+
+/scripts

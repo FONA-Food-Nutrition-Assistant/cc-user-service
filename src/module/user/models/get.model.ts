@@ -6,6 +6,7 @@ import { error } from 'console';
 import { ResponseMessage } from 'src/common/message/message.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { UserAllergyEntity } from '../entities/user-allergy.entity';
+import { AllergyEntity } from '../entities/allergy.entity';
 
 @Injectable()
 export class GetModel {
@@ -14,45 +15,42 @@ export class GetModel {
 		private readonly UserRepository: Repository<UserEntity>,
 		@InjectRepository(UserAllergyEntity)
 		private readonly UserAllergyRepository: Repository<UserAllergyEntity>,
+		@InjectRepository(AllergyEntity)
+		private readonly AllergyRepository: Repository<AllergyEntity>,
 	) {}
 
-	async getUsers() {
-		try {
-			const result = await this.UserRepository.find(); // ganti ke querybuilder
-			return result;
-		} catch (error) {
-			throw error;
-		}
+	async getUsers(): Promise<UserEntity[]> {
+		const query = this.UserRepository.createQueryBuilder('user');
+		return await query.getRawMany();
 	}
 
-	async getUserById(uid) {
-		try {
-			const result = await this.UserRepository.createQueryBuilder('user')
-				.select('*')
-				.where('uid = :uid', { uid: uid })
-				.getRawOne();
+	async getUserById(uid: string): Promise<UserEntity> {
+		const query = this.UserRepository.createQueryBuilder('user')
+			.select('*')
+			.where('uid = :uid', { uid: uid });
 
-			if (!result)
-				throw new HttpException(
-					ResponseMessage.ERR_USER_NOT_FOUND,
-					HttpStatus.BAD_REQUEST,
-				);
-
-			return result;
-		} catch (error) {
-			throw error;
-		}
+		return await query.getRawOne();
 	}
 
-	async getUserAllergyByUserId(uid: string) {
-		try {
-			const query = this.UserAllergyRepository.createQueryBuilder('ua')
-				.select('*')
-				.where('user_id = :user_id', { user_id: uid });
+	async getUserAllergyByUserId(uid: string): Promise<AllergyEntity[]> {
+		const query = this.UserAllergyRepository.createQueryBuilder('ua')
+			.select('a.id', 'id')
+			.addSelect('a.name', 'name')
+			.leftJoin(AllergyEntity, 'a', 'a.id = ua.allergy_id')
+			.where('user_id = :user_id', { user_id: uid });
 
-			return await query.getRawMany();
-		} catch {
-			throw error;
+		return await query.getRawMany();
+	}
+
+	async getAllergyByIds(allergy_ids: Array<number>): Promise<AllergyEntity[]> {
+		let query = this.AllergyRepository.createQueryBuilder('a')
+			.select('id')
+			.addSelect('name');
+		if (allergy_ids.length > 0) {
+			query = query.where('id IN (:...allergy_ids)', { allergy_ids });
+		} else {
+			query = query.where('1 = 0');
 		}
+		return await query.getRawMany();
 	}
 }
