@@ -1,31 +1,35 @@
-import { IsNotEmpty, IsString, IsEmail, IsNumber, IsArray, IsEnum } from 'class-validator';
+import {
+	IsNotEmpty,
+	IsString,
+	IsNumber,
+	IsEnum,
+	IsArray,
+} from 'class-validator';
 
-import { gender } from '../../../common/enum/gender.enum';
+import { Gender } from '../../../common/enum/gender.enum';
+import { Activity } from 'src/common/enum/activity.enum';
 
 export class CreateUserDto {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-  
-  @IsNotEmpty()
-  @IsNumber()
-  height: number;
+	@IsNotEmpty()
+	@IsNumber()
+	height: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  weight: number;
+	@IsNotEmpty()
+	@IsNumber()
+	weight: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  activity: number;
+	@IsNotEmpty()
+	@IsEnum(Activity)
+	activity: Activity;
 
-  @IsNotEmpty()
-  @IsEnum(gender)
-  gender: string;
+	@IsNotEmpty()
+	@IsEnum(Gender)
+	gender: Gender;
 
-  @IsString()
-  date_of_birth: string;
+	@IsString()
+	date_of_birth: Date;
 
-  @IsString({each: true})
-  alergies: string[]
+	@IsArray()
+	@IsNumber({}, { each: true })
+	allergies: Array<number>;
 }

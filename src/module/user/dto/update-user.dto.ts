@@ -1,34 +1,40 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
 
-import { IsNumber, IsNotEmpty, IsString, IsEmail, IsArray, IsEnum } from 'class-validator';
+import {
+	IsNumber,
+	IsString,
+	IsEnum,
+	IsArray,
+	IsOptional,
+} from 'class-validator';
 
-import { gender } from '../../../common/enum/gender.enum';
+import { Gender } from '../../../common/enum/gender.enum';
+import { Activity } from 'src/common/enum/activity.enum';
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-  
-  @IsNotEmpty()
-  @IsNumber()
-  height: number;
+export class RequestUpdateUserDto extends PartialType(CreateUserDto) {
+	@IsOptional()
+	@IsNumber()
+	height: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  weight: number;
+	@IsOptional()
+	@IsNumber()
+	weight: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  activity: number;
+	@IsOptional()
+	@IsEnum(Activity)
+	activity: Activity;
 
-  @IsNotEmpty()
-  @IsEnum(gender)
-  gender: string;
+	@IsOptional()
+	@IsEnum(Gender)
+	gender: Gender;
 
-  @IsString()
-  date_of_birth: string;
+	@IsOptional()
+	@IsString()
+	date_of_birth: Date;
 
-  @IsString({each: true})
-  alergies: string[]
+	@IsOptional()
+	@IsArray()
+	@IsNumber({}, { each: true })
+	allergies: Array<number>;
 }
