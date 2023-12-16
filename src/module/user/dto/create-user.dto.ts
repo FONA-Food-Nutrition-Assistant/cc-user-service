@@ -26,6 +26,7 @@ export class CreateUserDto {
 	@IsEnum(Gender)
 	gender: Gender;
 
+	@IsNotEmpty()
 	@IsString()
 	date_of_birth: Date;
 
